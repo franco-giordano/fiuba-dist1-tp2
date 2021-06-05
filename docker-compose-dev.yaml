@@ -1,0 +1,26 @@
+version: '3'
+services:
+  rabbitmq:
+    build:
+      context: ./rabbitmq
+      dockerfile: rabbitmq.dockerfile
+    ports:
+      - 15672:15672
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:15672"]
+        interval: 10s
+        timeout: 5s
+        retries: 10
+
+  node1:
+    container_name: node1
+    image: node1:latest
+    entrypoint: python3 /main.py
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    links: 
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      # - MAX_CHUNKS_PER_BLOCK=21
