@@ -21,6 +21,6 @@ with open('/sources/matches.csv', newline='') as csvf:
         serialized = DictEncoderDecoder.encode_dict(row_dict)
         channel.basic_publish(exchange='', routing_key=matches_queue, body=serialized)
         logging.info(f" [x] Sent line {serialized}")
-        time.sleep(1)
+        # time.sleep(1)
 
 connection.close()
