@@ -11,6 +11,8 @@ services:
         interval: 10s
         timeout: 5s
         retries: 10
+    networks:
+      - testing_net
 
   node1:
     container_name: node1
@@ -19,8 +21,18 @@ services:
     restart: on-failure
     depends_on:
       - rabbitmq
-    links: 
-      - rabbitmq
+    # links: 
+    #   - rabbitmq
     environment:
       - PYTHONUNBUFFERED=1
       # - MAX_CHUNKS_PER_BLOCK=21
+    networks:
+      - testing_net
+
+
+networks:
+  testing_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.25.125.0/24
