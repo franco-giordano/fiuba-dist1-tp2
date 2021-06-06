@@ -6,7 +6,7 @@ default: build
 all:
 
 docker-image:
-	docker build -f ./node1/Dockerfile -t "node1:latest" .
+	docker build -f ./filter-q1/Dockerfile -t "filter-q1:latest" .
 .PHONY: docker-image
 
 docker-compose-up: docker-image

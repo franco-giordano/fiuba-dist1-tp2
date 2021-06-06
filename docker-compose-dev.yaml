@@ -14,15 +14,13 @@ services:
     networks:
       - testing_net
 
-  node1:
-    container_name: node1
-    image: node1:latest
+  filter-q1:
+    container_name: filter-q1
+    image: filter-q1:latest
     entrypoint: python3 /main.py
     restart: on-failure
     depends_on:
       - rabbitmq
-    # links: 
-    #   - rabbitmq
     environment:
       - PYTHONUNBUFFERED=1
       # - MAX_CHUNKS_PER_BLOCK=21

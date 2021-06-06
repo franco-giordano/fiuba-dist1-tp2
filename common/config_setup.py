@@ -24,12 +24,12 @@ def _parse_config_params(cfg_name, key_params_dict):
 
 	for k, v in key_params_dict.items():
 		try:
-			config_params[v[0]] = _get_config_key(k, ini_config)
+			config_params[k] = _get_config_key(k, ini_config)
 
-			is_int = v[1]
+			is_int = v
 
 			if is_int:
-				config_params[v[0]] = int(config_params[v[0]])
+				config_params[k] = int(config_params[k])
 		except ValueError as e:
 			raise ValueError("Key could not be parsed. Error: {}. Aborting server".format(e))
 
