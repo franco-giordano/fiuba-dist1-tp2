@@ -1,6 +1,5 @@
 from common.config_setup import setup
 from common.fanout_controller import FanoutController
-import pika
 
 def main():
 	config_params = setup('config.ini', {'INPUT_MATCHES_QUEUE': False, 'MATCHES_EXCHANGE_NAME': False, 'RABBIT_IP': False})

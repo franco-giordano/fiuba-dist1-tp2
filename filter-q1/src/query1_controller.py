@@ -1,5 +1,4 @@
 import pika
-from common.match_encoder_decoder import MatchEncoderDecoder
 from common.batch_encoder_decoder import BatchEncoderDecoder
 from src.filter_query1 import FilterQuery1
 import logging
@@ -23,17 +22,17 @@ class Query1Controller:
         self.filter = FilterQuery1()
 
     def run(self):
-        logging.info(' [*] Waiting for messages. To exit press CTRL+C')
+        logging.info('FILTER QUERY1: Waiting for messages. To exit press CTRL+C')
         self.channel.start_consuming()
         self.connection.close()
 
     def _callback(self, ch, method, properties, body):
         batch = BatchEncoderDecoder.decode_bytes(body)
-        logging.info(f" [x] Received batch {body[:25]}...")
+        logging.info(f"FILTER QUERY1: Received batch {body[:25]}...")
 
         passing = list(filter(self.filter.should_pass, batch))
 
         if passing:
-            logging.info(f' [Y] Sending to output queue the passing matches {passing}')
+            logging.info(f'FILTER QUERY1: Sending to output queue the passing matches {passing}')
             serialized = BatchEncoderDecoder.encode_batch(passing)
             self.channel.basic_publish(exchange='', routing_key=self.output_queue_name, body=serialized)
