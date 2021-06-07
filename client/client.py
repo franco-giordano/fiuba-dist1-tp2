@@ -30,7 +30,7 @@ with open('/sources/matches.csv', newline='') as csvf:
         if count >= BATCH_SIZE:
             serialized = BatchEncoderDecoder.encode_batch(batch)
             channel.basic_publish(exchange='', routing_key=matches_queue, body=serialized)
-            logging.info(f" [x] Sent batch {serialized[:25]}")
+            logging.info(f" [x] Sent batch {serialized[:25]}...")
             batch = []
             count = 0
             # time.sleep(5)
@@ -38,6 +38,6 @@ with open('/sources/matches.csv', newline='') as csvf:
     if count > 0:
         serialized = BatchEncoderDecoder.encode_batch(batch)
         channel.basic_publish(exchange='', routing_key=matches_queue, body=serialized)
-        logging.info(f" [x] Sent last missing batch {serialized[:25]}")
+        logging.info(f" [x] Sent last missing batch {serialized[:25]}...")
     
 connection.close()

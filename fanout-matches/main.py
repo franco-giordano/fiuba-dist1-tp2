@@ -1,4 +1,5 @@
 from common.config_setup import setup
+from common.fanout_controller import FanoutController
 import pika
 
 def main():
@@ -7,17 +8,8 @@ def main():
 	matches_queue = config_params['INPUT_MATCHES_QUEUE']
 	exchange_name = config_params['MATCHES_EXCHANGE_NAME']
 
-    connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host=rabbit_ip))
-    channel = connection.channel()
-
-    channel.exchange_declare(exchange=exchange_name, exchange_type='fanout')
-
-    message = 
-    channel.basic_publish(exchange=exchange_name, routing_key='', body=message)
-
-    
-    connection.close()
+	fanout = FanoutController(rabbit_ip, matches_queue, exchange_name)
+	fanout.run()
 
 if __name__== "__main__":
 	main()

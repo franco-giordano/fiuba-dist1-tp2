@@ -14,6 +14,18 @@ services:
     networks:
       - testing_net
 
+  fanout-matches:
+    container_name: fanout-matches
+    image: fanout-matches:latest
+    restart: on-failure
+    depends_on:
+      - rabbitmq
+    environment:
+      - PYTHONUNBUFFERED=1
+      # - MAX_CHUNKS_PER_BLOCK=21
+    networks:
+      - testing_net
+
   filter-q1:
     container_name: filter-q1
     image: filter-q1:latest
