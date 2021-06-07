@@ -1,5 +1,6 @@
 import pika
-from common.dict_encoder_decoder import DictEncoderDecoder
+from common.match_encoder_decoder import MatchEncoderDecoder
+from common.batch_encoder_decoder import BatchEncoderDecoder
 from src.filter_query1 import FilterQuery1
 import logging
 
@@ -25,12 +26,12 @@ class Query1Controller:
         self.channel.start_consuming()
 
     def _callback(self, ch, method, properties, body):
-        logging.info(f" [x] Received {body}. Will deserialize...")
-        match_dict = DictEncoderDecoder.decode_bytes(body)
-        logging.info(f" [x] Parsed as {match_dict}")
+        batch = BatchEncoderDecoder.decode_bytes(body)
+        logging.info(f" [x] Received batch and parsed as {batch[:25]}")
 
-        should_pass = self.filter.should_pass(match_dict)
+        passing = list(filter(self.filter.should_pass, batch))
 
-        if should_pass:
-            logging.info(f' [Y] Match {match_dict} should pass! Sending to output queue')
-            self.channel.basic_publish(exchange='', routing_key=self.output_queue_name, body=DictEncoderDecoder.encode_dict(match_dict))
+        if passing:
+            logging.info(f' [Y] Sending to output queue the passing matches {passing}')
+            serialized = BatchEncoderDecoder.encode_batch(passing)
+            self.channel.basic_publish(exchange='', routing_key=self.output_queue_name, body=serialized)
