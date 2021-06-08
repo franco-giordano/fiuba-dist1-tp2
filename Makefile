@@ -10,6 +10,7 @@ docker-image:
 	docker build -f ./fanout-matches/Dockerfile -t "fanout-matches:latest" .
 	docker build -f ./fanout-players/Dockerfile -t "fanout-players:latest" .
 	docker build -f ./filter-rating/Dockerfile -t "filter-rating:latest" .
+	docker build -f ./shard-exchanger-q2/Dockerfile -t "shard-exchanger-q2:latest" .
 .PHONY: docker-image
 
 docker-compose-up: docker-image
