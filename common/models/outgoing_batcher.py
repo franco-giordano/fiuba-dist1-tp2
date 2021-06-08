@@ -1,5 +1,5 @@
-from common.batch_encoder_decoder import BatchEncoderDecoder
-from common.shard_key_getter import ShardKeyGetter
+from common.encoders.batch_encoder_decoder import BatchEncoderDecoder
+from common.models.shard_key_getter import ShardKeyGetter
 import logging
 
 class OutgoingBatcher:
@@ -18,8 +18,10 @@ class OutgoingBatcher:
         self.all_outgoing_batches[shard_key] = batch
 
     def publish_if_full(self):
-        for shard_key,batch in self.all_outgoing_batches.items():
+        for shard_key in list(self.all_outgoing_batches):
+            batch = self.all_outgoing_batches[shard_key]
             if len(batch) >= self.max_batch_size:
-                logging.info(f'SHARDING EXCHANGE: Announcing batch for shard key {shard_key}')
+                logging.info(f'SHARD EXCHANGE: Announcing batch for shard key {shard_key}')
                 serialized = BatchEncoderDecoder.encode_batch(batch)
                 self.channel.basic_publish(exchange=self.output_exchange_name, routing_key=shard_key, body=serialized)
+                del self.all_outgoing_batches[shard_key]

@@ -1,4 +1,4 @@
-from common.config_setup import setup
+from common.utils.config_setup import setup
 from src.shard_exchange_controller import ShardExchangeController
 
 def main():

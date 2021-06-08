@@ -1,4 +1,5 @@
 import pika
+from common.utils.rabbit_utils import RabbitUtils
 import logging
 
 class FanoutController:
@@ -6,14 +7,13 @@ class FanoutController:
         self.exchange_name = exchange_name
         self.sources_queue_name = sources_queue_name
 
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbit_ip))
-        self.channel = self.connection.channel()
+        self.connection, self.channel = RabbitUtils.setup_connection_with_channel(rabbit_ip)
 
-        self.channel.queue_declare(queue=self.sources_queue_name)
-        self.channel.exchange_declare(exchange=self.exchange_name, exchange_type='fanout')
+        # setup input queue
+        RabbitUtils.setup_input_queue(self.channel, self.sources_queue_name, self._callback)
 
-        self.channel.basic_consume(
-            queue=self.sources_queue_name, on_message_callback=self._callback, auto_ack=True)
+        # setup output exchange
+        RabbitUtils.setup_fanout_exchange(self.channel, self.exchange_name)
 
     def run(self):
         logging.info('FANOUT: Waiting for messages. To exit press CTRL+C')

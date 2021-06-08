@@ -1,10 +1,10 @@
-import pika
 import logging
 import csv
 from multiprocessing import Process
-from common.player_encoder_decoder import PlayerEncoderDecoder
-from common.match_encoder_decoder import MatchEncoderDecoder
-from common.batch_encoder_decoder import BatchEncoderDecoder
+from common.encoders.player_encoder_decoder import PlayerEncoderDecoder
+from common.encoders.match_encoder_decoder import MatchEncoderDecoder
+from common.encoders.batch_encoder_decoder import BatchEncoderDecoder
+from common.utils.rabbit_utils import RabbitUtils
 
 class CSVDispatcher:
     def __init__(self, rabbit_ip, matches_queue, matches_path, players_queue, players_path, batch_size):
@@ -23,9 +23,8 @@ class CSVDispatcher:
         self.players_proc.join()
 
     def upload_csv(self, csv_path, queue_name, decoder):
-        connection = pika.BlockingConnection(pika.ConnectionParameters(host=self.rabbit_ip))
-        channel = connection.channel()
-        channel.queue_declare(queue=queue_name)
+        connection, channel = RabbitUtils.setup_connection_with_channel(self.rabbit_ip)
+        RabbitUtils.setup_queue(channel, queue_name)
 
         with open(csv_path, newline='') as csvf:
             reader = csv.DictReader(csvf)

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from common.config_setup import setup
+from common.utils.config_setup import setup
 from src.rating_filter_controller import RatingFilterController
 
 def main():

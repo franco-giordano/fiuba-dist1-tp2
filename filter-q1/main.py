@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from common.config_setup import setup
+from common.utils.config_setup import setup
 from src.query1_controller import Query1Controller
 
 def main():

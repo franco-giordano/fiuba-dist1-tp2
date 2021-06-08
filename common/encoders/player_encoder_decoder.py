@@ -1,4 +1,4 @@
-from common.obj_encoder_decoder import ObjectEncoderDecoder
+from common.encoders.obj_encoder_decoder import ObjectEncoderDecoder
 
 class PlayerEncoderDecoder:
     @staticmethod

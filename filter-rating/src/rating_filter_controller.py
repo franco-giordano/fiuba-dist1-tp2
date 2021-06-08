@@ -1,6 +1,6 @@
-import pika
-from common.batch_encoder_decoder import BatchEncoderDecoder
+from common.encoders.batch_encoder_decoder import BatchEncoderDecoder
 from src.filter_rating_player import FilterRatingPlayer
+from common.utils.rabbit_utils import RabbitUtils
 import logging
 
 class RatingFilterController:
@@ -10,19 +10,13 @@ class RatingFilterController:
         self.route_q2 = route_q2
         self.route_q4 = route_q4
 
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbit_ip))
-        self.channel = self.connection.channel()
+        self.connection, self.channel = RabbitUtils.setup_connection_with_channel(rabbit_ip)
 
         # setup input exchange
-        self.channel.exchange_declare(exchange=self.players_exchange_name, exchange_type='fanout')
-        result = self.channel.queue_declare(queue='', exclusive=True)
-        queue_name = result.method.queue
-        self.channel.queue_bind(exchange=self.players_exchange_name, queue=queue_name)
-        self.channel.basic_consume(
-            queue=queue_name, on_message_callback=self._callback, auto_ack=True)
+        RabbitUtils.setup_input_fanout_exchange(self.channel, self.players_exchange_name, self._callback)
 
         # setup output exchange
-        self.channel.exchange_declare(exchange=self.output_exchange_name, exchange_type='direct')
+        RabbitUtils.setup_output_direct_exchange(self.channel, self.output_exchange_name)
 
         self.filter = FilterRatingPlayer()
 

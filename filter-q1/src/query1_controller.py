@@ -1,6 +1,6 @@
-import pika
-from common.batch_encoder_decoder import BatchEncoderDecoder
+from common.encoders.batch_encoder_decoder import BatchEncoderDecoder
 from src.filter_query1 import FilterQuery1
+from common.utils.rabbit_utils import RabbitUtils
 import logging
 
 class Query1Controller:
@@ -8,17 +8,14 @@ class Query1Controller:
         self.matches_exchange_name = matches_exchange_name
         self.output_queue_name = output_queue_name
 
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=rabbit_ip))
+        self.connection, self.channel = RabbitUtils.setup_connection_with_channel(rabbit_ip)
 
-        self.channel = self.connection.channel()
-        self.channel.exchange_declare(exchange=self.matches_exchange_name, exchange_type='fanout')
-        result = self.channel.queue_declare(queue='', exclusive=True)
-        queue_name = result.method.queue
-        self.channel.queue_bind(exchange=self.matches_exchange_name, queue=queue_name)
-        self.channel.basic_consume(
-            queue=queue_name, on_message_callback=self._callback, auto_ack=True)
+        # input exchange
+        RabbitUtils.setup_input_fanout_exchange(self.channel, self.matches_exchange_name, self._callback)
 
-        self.channel.queue_declare(queue=self.output_queue_name)
+        # output queue
+        RabbitUtils.setup_queue(self.channel, self.output_queue_name)
+
         self.filter = FilterQuery1()
 
     def run(self):

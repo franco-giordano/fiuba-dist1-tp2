@@ -1,4 +1,4 @@
-from common.config_setup import setup
+from common.utils.config_setup import setup
 from src.csv_dispatcher import CSVDispatcher
 
 config_params = setup('config.ini',

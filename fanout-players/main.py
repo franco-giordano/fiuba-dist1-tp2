@@ -1,5 +1,5 @@
-from common.config_setup import setup
-from common.fanout_controller import FanoutController
+from common.utils.config_setup import setup
+from common.controllers.fanout_controller import FanoutController
 
 def main():
 	config_params = setup('config.ini', {'INPUT_PLAYERS_QUEUE': False, 'PLAYERS_EXCHANGE_NAME': False, 'RABBIT_IP': False})
