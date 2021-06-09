@@ -27,7 +27,6 @@ services:
       - fanout-matches
     environment:
       - PYTHONUNBUFFERED=1
-      # - MAX_CHUNKS_PER_BLOCK=21
     networks:
       - testing_net
 
@@ -40,7 +39,6 @@ services:
       - fanout-players
     environment:
       - PYTHONUNBUFFERED=1
-      # - MAX_CHUNKS_PER_BLOCK=21
     networks:
       - testing_net
 
@@ -53,7 +51,30 @@ services:
       - shard-exchanger-q2
     environment:
       - PYTHONUNBUFFERED=1
-      # - MAX_CHUNKS_PER_BLOCK=21
+    networks:
+      - testing_net
+
+  filter-by-ladder:
+    stop_signal: SIGINT
+    container_name: filter-by-ladder
+    image: filter-by-ladder:latest
+    entrypoint: python3 /main.py
+    depends_on:
+      - fanout-matches
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - testing_net
+
+  filter-matches-q3:
+    stop_signal: SIGINT
+    container_name: filter-matches-q3
+    image: filter-matches-q3:latest
+    entrypoint: python3 /main.py
+    depends_on:
+      - filter-by-ladder
+    environment:
+      - PYTHONUNBUFFERED=1
     networks:
       - testing_net
 

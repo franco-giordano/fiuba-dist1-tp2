@@ -3,8 +3,7 @@ from common.encoders.obj_encoder_decoder import ObjectEncoderDecoder
 class MatchEncoderDecoder:
     @staticmethod
     def decode_bytes(bytes_recv: bytes) -> dict:
-        parsed = ObjectEncoderDecoder.decode_bytes(bytes_recv)
-        return MatchEncoderDecoder.parse_dict(parsed)
+        return ObjectEncoderDecoder.decode_bytes(bytes_recv)
 
     @staticmethod
     def encode_match(dict_recv: dict) -> bytes:
