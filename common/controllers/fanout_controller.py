@@ -1,5 +1,6 @@
 import pika
 from common.utils.rabbit_utils import RabbitUtils
+from common.encoders.batch_encoder_decoder import BatchEncoderDecoder
 import logging
 
 class FanoutController:
@@ -22,4 +23,11 @@ class FanoutController:
 
     def _callback(self, ch, method, properties, body):
         logging.info(f"FANOUT: Received batch {body[:25]}...")
+        is_sentinel = BatchEncoderDecoder.is_encoded_sentinel(body)
+
         self.channel.basic_publish(exchange=self.exchange_name, routing_key='', body=body)
+        
+        if is_sentinel:
+            logging.info(f"FANOUT: Received sentinel! Shutting down...")
+            # TODO: shutdown my node...
+            pass

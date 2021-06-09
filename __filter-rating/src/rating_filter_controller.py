@@ -26,6 +26,13 @@ class RatingFilterController:
         self.connection.close()
 
     def _callback(self, ch, method, properties, body):
+        if BatchEncoderDecoder.is_encoded_sentinel(body):
+            logging.info(f"RATING FILTER: Received sentinel! Propagating and shutting down...")
+            self.channel.basic_publish(exchange=self.output_exchange_name, routing_key=self.route_q2, body=body)
+            self.channel.basic_publish(exchange=self.output_exchange_name, routing_key=self.route_q4, body=body)
+            # TODO: shutdown my node
+            return
+
         batch = BatchEncoderDecoder.decode_bytes(body)
         logging.info(f"RATING FILTER: Received batch {body[:25]}...")
 

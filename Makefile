@@ -9,19 +9,32 @@ docker-image:
 	docker build -f ./filter-q1/Dockerfile -t "filter-q1:latest" .
 	docker build -f ./fanout-matches/Dockerfile -t "fanout-matches:latest" .
 	docker build -f ./fanout-players/Dockerfile -t "fanout-players:latest" .
-	docker build -f ./filter-rating/Dockerfile -t "filter-rating:latest" .
 	docker build -f ./shard-exchanger-q2/Dockerfile -t "shard-exchanger-q2:latest" .
+	docker build -f ./group-by-nodes-q2/Dockerfile -t "group-by-nodes-q2:latest" .
 .PHONY: docker-image
 
-docker-compose-up: docker-image
+rabbit-up:
+	docker-compose -f docker-compose-rabbit.yaml up -d --build
+.PHONY: rabbit-up
+
+rabbit-down:
+	docker-compose -f docker-compose-rabbit.yaml stop -t 10
+	docker-compose -f docker-compose-rabbit.yaml down
+.PHONY: rabbit-down
+
+rabbit-logs:
+	docker-compose -f docker-compose-rabbit.yaml logs -f
+.PHONY: rabbit-logs
+
+nodes-up: docker-image
 	docker-compose -f docker-compose-dev.yaml up -d --build
-.PHONY: docker-compose-up
+.PHONY: nodes-up
 
-docker-compose-down:
-	docker-compose -f docker-compose-dev.yaml stop -t 1
+nodes-down:
+	docker-compose -f docker-compose-dev.yaml stop -t 10
 	docker-compose -f docker-compose-dev.yaml down
-.PHONY: docker-compose-down
+.PHONY: nodes-down
 
-docker-compose-logs:
+nodes-logs:
 	docker-compose -f docker-compose-dev.yaml logs -f
-.PHONY: docker-compose-logs
+.PHONY: nodes-logs

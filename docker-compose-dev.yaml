@@ -1,61 +1,30 @@
 version: '3'
 services:
-  rabbitmq:
-    build:
-      context: ./rabbitmq
-      dockerfile: rabbitmq.dockerfile
-    ports:
-      - 15672:15672
-    healthcheck:
-        test: ["CMD", "curl", "-f", "http://localhost:15672"]
-        interval: 10s
-        timeout: 5s
-        retries: 10
-    networks:
-      - testing_net
-
   fanout-matches:
+    stop_signal: SIGINT
     container_name: fanout-matches
     image: fanout-matches:latest
-    restart: on-failure
-    depends_on:
-      - rabbitmq
     environment:
       - PYTHONUNBUFFERED=1
     networks:
       - testing_net
 
   fanout-players:
+    stop_signal: SIGINT
     container_name: fanout-players
     image: fanout-players:latest
-    restart: on-failure
-    depends_on:
-      - rabbitmq
     environment:
       - PYTHONUNBUFFERED=1
     networks:
       - testing_net
 
   filter-q1:
+    stop_signal: SIGINT
     container_name: filter-q1
     image: filter-q1:latest
     entrypoint: python3 /main.py
-    restart: on-failure
     depends_on:
-      - rabbitmq
-    environment:
-      - PYTHONUNBUFFERED=1
-      # - MAX_CHUNKS_PER_BLOCK=21
-    networks:
-      - testing_net
-
-  filter-rating:
-    container_name: filter-rating
-    image: filter-rating:latest
-    entrypoint: python3 /main.py
-    restart: on-failure
-    depends_on:
-      - rabbitmq
+      - fanout-matches
     environment:
       - PYTHONUNBUFFERED=1
       # - MAX_CHUNKS_PER_BLOCK=21
@@ -63,18 +32,31 @@ services:
       - testing_net
 
   shard-exchanger-q2:
+    stop_signal: SIGINT
     container_name: shard-exchanger-q2
     image: shard-exchanger-q2:latest
     entrypoint: python3 /main.py
-    restart: on-failure
     depends_on:
-      - rabbitmq
+      - fanout-players
     environment:
       - PYTHONUNBUFFERED=1
       # - MAX_CHUNKS_PER_BLOCK=21
     networks:
       - testing_net
-    
+
+  group-by-nodes-q2:
+    stop_signal: SIGINT
+    container_name: group-by-nodes-q2
+    image: group-by-nodes-q2:latest
+    entrypoint: python3 /main.py
+    depends_on:
+      - shard-exchanger-q2
+    environment:
+      - PYTHONUNBUFFERED=1
+      # - MAX_CHUNKS_PER_BLOCK=21
+    networks:
+      - testing_net
+
 networks:
   testing_net:
     ipam:

@@ -47,5 +47,9 @@ class CSVDispatcher:
                 serialized = BatchEncoderDecoder.encode_batch(batch)
                 channel.basic_publish(exchange='', routing_key=queue_name, body=serialized)
                 logging.info(f"{queue_name}: Sent last missing batch {serialized[:25]}...")
-            
+
+        logging.info(f"{queue_name}: Reached EOF, sending sentinel")
+        sentinel_batch = BatchEncoderDecoder.create_encoded_sentinel()
+        channel.basic_publish(exchange='', routing_key=queue_name, body=sentinel_batch)
+
         connection.close()

@@ -2,7 +2,7 @@ from common.encoders.batch_encoder_decoder import BatchEncoderDecoder
 from common.models.shard_key_getter import ShardKeyGetter
 import logging
 
-class OutgoingBatcher:
+class ShardedOutgoingBatcher:
     def __init__(self, rabbit_channel, reducers_amount, batch_size, output_exchange_name):
         self.all_outgoing_batches = {}
         self.shard_key_getter = ShardKeyGetter(reducers_amount)
@@ -25,3 +25,19 @@ class OutgoingBatcher:
                 serialized = BatchEncoderDecoder.encode_batch(batch)
                 self.channel.basic_publish(exchange=self.output_exchange_name, routing_key=shard_key, body=serialized)
                 del self.all_outgoing_batches[shard_key]
+
+    def received_sentinel(self):
+        logging.info(f'SHARD EXCHANGE: Flushing all batches...')
+        self._flush_all_batches()
+
+        logging.info(f'SHARD EXCHANGE: Sending sentinels to all shards...')
+        sentinel = BatchEncoderDecoder.create_encoded_sentinel()
+        all_keys = self.shard_key_getter.generate_all_shard_keys()
+        for key in all_keys:
+            self.channel.basic_publish(exchange=self.output_exchange_name, routing_key=key, body=sentinel)
+
+    def _flush_all_batches(self):
+        for shard_key, batch in self.all_outgoing_batches.items():
+            serialized = BatchEncoderDecoder.encode_batch(batch)
+            self.channel.basic_publish(exchange=self.output_exchange_name, routing_key=shard_key, body=serialized)
+

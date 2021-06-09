@@ -24,9 +24,13 @@ class Query1Controller:
         self.connection.close()
 
     def _callback(self, ch, method, properties, body):
+        if BatchEncoderDecoder.is_encoded_sentinel(body):
+            logging.info(f"FILTER QUERY1: Received sentinel! Shutting down...")
+            # TODO: shutdown my node
+            return
+
         batch = BatchEncoderDecoder.decode_bytes(body)
         logging.info(f"FILTER QUERY1: Received batch {body[:25]}...")
-
         passing = list(filter(self.filter.should_pass, batch))
 
         if passing:
