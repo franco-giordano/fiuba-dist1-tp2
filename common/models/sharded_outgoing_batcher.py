@@ -3,15 +3,16 @@ from common.models.shard_key_getter import ShardKeyGetter
 import logging
 
 class ShardedOutgoingBatcher:
-    def __init__(self, rabbit_channel, reducers_amount, batch_size, output_exchange_name):
+    def __init__(self, rabbit_channel, reducers_amount, batch_size, output_exchange_name, tkn_key='match'):
         self.all_outgoing_batches = {}
         self.shard_key_getter = ShardKeyGetter(reducers_amount)
         self.channel = rabbit_channel
         self.max_batch_size = batch_size
         self.output_exchange_name = output_exchange_name
+        self.tkn_key = tkn_key
 
     def add_to_batch(self, item):
-        shard_key = self.shard_key_getter.get_key_for_str(item['match'])
+        shard_key = self.shard_key_getter.get_key_for_str(item[self.tkn_key])
         
         batch = self.all_outgoing_batches.get(shard_key, [])
         batch.append(item)
