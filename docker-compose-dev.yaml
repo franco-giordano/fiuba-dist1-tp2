@@ -78,6 +78,30 @@ services:
     networks:
       - testing_net
 
+  filter-pro-players-q3:
+    stop_signal: SIGINT
+    container_name: filter-pro-players-q3
+    image: filter-pro-players-q3:latest
+    entrypoint: python3 /main.py
+    depends_on:
+      - fanout-players
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - testing_net
+
+  join-nodes-q3:
+    stop_signal: SIGINT
+    container_name: join-nodes-q3
+    image: join-nodes-q3:latest
+    entrypoint: python3 /main.py
+    depends_on:
+      - filter-matches-q3
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - testing_net
+
 networks:
   testing_net:
     ipam:

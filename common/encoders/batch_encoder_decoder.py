@@ -19,3 +19,11 @@ class BatchEncoderDecoder:
     @classmethod
     def is_encoded_sentinel(cls, bytes_recv):
         return cls.ENCODED_SENTINEL == bytes_recv
+
+    @classmethod
+    def is_players_batch(cls, decoded_batch):
+        return 'match' in decoded_batch[0]
+
+    @classmethod
+    def is_matches_batch(cls, decoded_batch):
+        return not cls.is_players_batch(decoded_batch)
