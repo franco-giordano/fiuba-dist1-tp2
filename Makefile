@@ -15,6 +15,7 @@ docker-image:
 	docker build -f ./filter-matches-q3/Dockerfile -t "filter-matches-q3:latest" .
 	docker build -f ./filter-pro-players-q3/Dockerfile -t "filter-pro-players-q3:latest" .
 	docker build -f ./join-nodes-q3/Dockerfile -t "join-nodes-q3:latest" .
+	docker build -f ./group-by-nodes-q3/Dockerfile -t "group-by-nodes-q3:latest" .
 .PHONY: docker-image
 
 rabbit-up:
