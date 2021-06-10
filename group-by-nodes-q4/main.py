@@ -1,7 +1,7 @@
 from common.utils.config_setup import setup
 from multiprocessing import Process
 from common.controllers.sharded_grouper_controller import ShardedGrouperController
-from common.models.victories_total_aggregator import VictoriesTotalAggregator
+from common.models.total_uses_aggregator import TotalUsesAggregator
 
 def main():
 	config_params = setup('config.ini',
@@ -26,7 +26,7 @@ def main():
 
 def reducer_init(proc_id, rabbit_ip, shard_exchange_name, output_queue_name):
 	shard_key = str(proc_id)
-	aggregator = VictoriesTotalAggregator()
+	aggregator = TotalUsesAggregator()
 	grouper = ShardedGrouperController(rabbit_ip, shard_exchange_name, output_queue_name, shard_key, aggregator)
 	grouper.run()
 

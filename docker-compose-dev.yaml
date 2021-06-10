@@ -156,6 +156,18 @@ services:
     networks:
       - testing_net
 
+  group-by-nodes-q4:
+    stop_signal: SIGINT
+    container_name: group-by-nodes-q4
+    image: group-by-nodes-q4:latest
+    entrypoint: python3 /main.py
+    depends_on:
+      - join-nodes-q4
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - testing_net
+
 networks:
   testing_net:
     ipam:
