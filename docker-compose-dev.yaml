@@ -131,6 +131,18 @@ services:
       - PYTHONUNBUFFERED=1
     networks:
       - testing_net
+  
+  filter-matches-q4:
+    stop_signal: SIGINT
+    container_name: filter-matches-q4
+    image: filter-matches-q4:latest
+    entrypoint: python3 /main.py
+    depends_on:
+      - filter-by-ladder
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - testing_net
 
 networks:
   testing_net:
