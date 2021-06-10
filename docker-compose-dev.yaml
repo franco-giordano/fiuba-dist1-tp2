@@ -33,12 +33,30 @@ services:
   exchanger-q2:
     stop_signal: SIGINT
     container_name: exchanger-q2
-    image: exchanger-q2:latest
+    image: exchanger:latest
     entrypoint: python3 /main.py
     depends_on:
       - fanout-players
     environment:
       - PYTHONUNBUFFERED=1
+      - OUTPUT_EXCHANGE_NAME=sharded-by-match-q2
+      - NEXT_REDUCERS_AMOUNT=5
+      - BATCH_SIZE=10000
+    networks:
+      - testing_net
+
+  exchanger-q3:
+    stop_signal: SIGINT
+    container_name: exchanger-q3
+    image: exchanger:latest
+    entrypoint: python3 /main.py
+    depends_on:
+      - fanout-players
+    environment:
+      - PYTHONUNBUFFERED=1
+      - OUTPUT_EXCHANGE_NAME=sharded-by-match-q3
+      - REDUCERS_AMOUNT=5
+      - BATCH_SIZE=10000
     networks:
       - testing_net
 

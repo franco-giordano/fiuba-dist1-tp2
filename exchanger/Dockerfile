@@ -1,4 +1,4 @@
 FROM rabbitmq-python-base:0.0.1
 COPY common /common
-COPY exchanger-q2 /
+COPY exchanger /
 CMD ["python3", "./main.py"]
