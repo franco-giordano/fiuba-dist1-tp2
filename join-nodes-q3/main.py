@@ -1,4 +1,4 @@
-from common.utils.config_setup import setup
+from common.utils.config_setup import setup, _initialize_log
 from multiprocessing import Process
 from common.controllers.sharded_joiner_controller import ShardedJoinerController
 
@@ -9,7 +9,7 @@ def main():
 		'RABBIT_IP': False,
 		'REDUCERS_AMOUNT': True,
 		'NEXT_REDUCERS_AMOUNT': True,
-		'TOTAL_INCOMING_SENTINELS': True})
+		'TOTAL_INCOMING_SENTINELS': True}, skip_log=True)
 	reducers_amount = config_params['REDUCERS_AMOUNT']
 
 	reducers_proc = []
@@ -30,6 +30,7 @@ def reducer_init(proc_id, config_params):
 	total_incoming_sentinels = config_params['TOTAL_INCOMING_SENTINELS']
 
 	shard_key = str(proc_id)
+	_initialize_log(shard_key)
 	joiner = ShardedJoinerController(rabbit_ip, shard_exchange_name, output_exchange_name, \
 		shard_key, next_reducers_amount, total_incoming_sentinels, force_send=False)
 	joiner.run()

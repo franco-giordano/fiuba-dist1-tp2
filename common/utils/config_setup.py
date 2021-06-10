@@ -2,8 +2,9 @@ import configparser
 import logging
 import os
 
-def setup(cfg_name, key_params_dict):
-	_initialize_log()
+def setup(cfg_name, key_params_dict, skip_log=False):
+	if not skip_log:
+		_initialize_log()
 	return _parse_config_params(cfg_name, key_params_dict)
 
 def _parse_config_params(cfg_name, key_params_dict):
@@ -46,15 +47,22 @@ def _get_config_key(name, config_fallback):
 	
 	return value
 
-def _initialize_log():
+def _initialize_log(p_id=None):
 	"""
 	Python custom logging initialization
 
 	Current timestamp is added to be able to identify in docker
 	compose logs the date when the log has arrived
 	"""
-	logging.basicConfig(
-		format='%(asctime)s %(levelname)-8s %(message)s',
-		level=logging.INFO,
-		datefmt='%Y-%m-%d %H:%M:%S',
-	)
+	if p_id is not None:
+		logging.basicConfig(
+			format=f'%(asctime)s %(levelname)-8s #{p_id} %(message)s',
+			level=logging.INFO,
+			datefmt='%Y-%m-%d %H:%M:%S',
+		)
+	else:
+		logging.basicConfig(
+			format='%(asctime)s %(levelname)-8s %(message)s',
+			level=logging.INFO,
+			datefmt='%Y-%m-%d %H:%M:%S',
+		)

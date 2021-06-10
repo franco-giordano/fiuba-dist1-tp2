@@ -25,7 +25,7 @@ class ShardedJoinerController:
         try:
             self.channel.start_consuming()
         except KeyboardInterrupt:
-            logging.warning('SHARDED JOINER: ######### Received Ctrl+C! Stopping...')
+            logging.warning(f'SHARDED JOINER {self.assigned_shard_key}: ######### Received Ctrl+C! Stopping...')
             self.channel.stop_consuming()
         self.connection.close()
 
