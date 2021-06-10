@@ -1,6 +1,5 @@
 import logging
 from common.encoders.batch_encoder_decoder import BatchEncoderDecoder
-from common.models.filter_query2 import FilterQuery2
 
 class CivilizationsGrouper:
     def __init__(self, channel, output_queue_name, aggregator):
