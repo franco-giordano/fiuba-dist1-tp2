@@ -1,6 +1,7 @@
 from common.utils.config_setup import setup, _initialize_log
 from multiprocessing import Process
 from common.controllers.sharded_joiner_controller import ShardedJoinerController
+import logging
 
 def main():
 	config_params = setup('config.ini',
@@ -19,8 +20,12 @@ def main():
 		reducers_proc.append(pr)
 		pr.start()
 
+	_initialize_log(str(-99))
+	logging.info(f'@MAIN: ############ WAITING...')
+
 	for p in reducers_proc:
 		p.join()
+		logging.info(f'@MAIN: ############ PROCESS NUMBER {p} FINISHED!')
 
 def reducer_init(proc_id, config_params):
 	rabbit_ip = config_params['RABBIT_IP']

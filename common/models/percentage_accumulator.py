@@ -9,8 +9,8 @@ class PercentageAccumulator:
         civ, pair = data
         logging.info(f"PERCENTAGE ACCUMULATOR: Received partial count for civ {civ} data {pair}")
         current_victories_total = self.accum.get(civ, [0,0])
-        current_victories_total[0] += counts_pair[0]
-        current_victories_total[1] += counts_pair[1]
+        current_victories_total[0] += pair[0]
+        current_victories_total[1] += pair[1]
         self.accum[civ] = current_victories_total
 
     def flush_results(self, channel, queue_name):
