@@ -1,20 +1,20 @@
 from common.utils.config_setup import setup
-from src.pro_players_query3_controller import ProPlayersQuery3Controller
+from src.pro_players_controller import ProPlayersController
 
 def main():
 	config_params = setup('config.ini',
 		{'PLAYERS_EXCHANGE_NAME': False,
 		'OUTPUT_EXCHANGE_NAME': False,
 		'RABBIT_IP': False,
-		'REDUCERS_AMOUNT': True,
+		'NEXT_REDUCERS_AMOUNT': True,
 		'BATCH_SIZE': True})
 	rabbit_ip = config_params['RABBIT_IP']
 	players_exchange_name = config_params['PLAYERS_EXCHANGE_NAME']
 	output_exchange_name = config_params['OUTPUT_EXCHANGE_NAME']
-	reducers_amount = config_params['REDUCERS_AMOUNT']
+	reducers_amount = config_params['NEXT_REDUCERS_AMOUNT']
 	batch_size = config_params['BATCH_SIZE']
 
-	controller = ProPlayersQuery3Controller(rabbit_ip, players_exchange_name, \
+	controller = ProPlayersController(rabbit_ip, players_exchange_name, \
 		output_exchange_name, reducers_amount, batch_size)
 	controller.run()
 

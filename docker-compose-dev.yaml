@@ -30,10 +30,10 @@ services:
     networks:
       - testing_net
 
-  shard-exchanger-q2:
+  exchanger-q2:
     stop_signal: SIGINT
-    container_name: shard-exchanger-q2
-    image: shard-exchanger-q2:latest
+    container_name: exchanger-q2
+    image: exchanger-q2:latest
     entrypoint: python3 /main.py
     depends_on:
       - fanout-players
@@ -48,7 +48,7 @@ services:
     image: group-by-nodes-q2:latest
     entrypoint: python3 /main.py
     depends_on:
-      - shard-exchanger-q2
+      - exchanger-q2
     environment:
       - PYTHONUNBUFFERED=1
     networks:
@@ -78,10 +78,10 @@ services:
     networks:
       - testing_net
 
-  filter-pro-players-q3:
+  filter-pro-players-q4:
     stop_signal: SIGINT
-    container_name: filter-pro-players-q3
-    image: filter-pro-players-q3:latest
+    container_name: filter-pro-players-q4
+    image: filter-pro-players-q4:latest
     entrypoint: python3 /main.py
     depends_on:
       - fanout-players

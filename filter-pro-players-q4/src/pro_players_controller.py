@@ -4,7 +4,7 @@ from common.models.sharded_outgoing_batcher import ShardedOutgoingBatcher
 from common.utils.rabbit_utils import RabbitUtils
 import logging
 
-class ProPlayersQuery3Controller:
+class ProPlayersController:
     def __init__(self, rabbit_ip, players_exchange_name, output_exchange_name, reducers_amount, batch_size):
         self.players_exchange_name = players_exchange_name
         self.output_exchange_name = output_exchange_name
@@ -21,13 +21,13 @@ class ProPlayersQuery3Controller:
         self.sharded_outgoing_batcher = ShardedOutgoingBatcher(self.channel, reducers_amount, batch_size, output_exchange_name, tkn_key='match')
 
     def run(self):
-        logging.info('FILTER QUERY3: Waiting for messages. To exit press CTRL+C')
+        logging.info('FILTER PRO PLAYERS: Waiting for messages. To exit press CTRL+C')
         self.channel.start_consuming()
         self.connection.close()
 
     def _callback(self, ch, method, properties, body):
         if BatchEncoderDecoder.is_encoded_sentinel(body):
-            logging.info(f"FILTER QUERY3: Received sentinel! Shutting down...")
+            logging.info(f"FILTER PRO PLAYERS: Received sentinel! Shutting down...")
             self.sharded_outgoing_batcher.received_sentinel()
             # TODO: shutdown my node
             return
