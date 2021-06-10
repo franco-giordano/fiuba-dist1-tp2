@@ -22,15 +22,18 @@ class ProPlayersController:
 
     def run(self):
         logging.info('FILTER PRO PLAYERS: Waiting for messages. To exit press CTRL+C')
-        self.channel.start_consuming()
+        try:
+            self.channel.start_consuming()
+        except KeyboardInterrupt:
+            logging.warning('FILTER PRO PLAYERS: ######### Received Ctrl+C! Stopping...')
+            self.channel.stop_consuming()
         self.connection.close()
 
     def _callback(self, ch, method, properties, body):
         if BatchEncoderDecoder.is_encoded_sentinel(body):
             logging.info(f"FILTER PRO PLAYERS: Received sentinel! Shutting down...")
             self.sharded_outgoing_batcher.received_sentinel()
-            # TODO: shutdown my node
-            return
+            raise KeyboardInterrupt
 
         batch = BatchEncoderDecoder.decode_bytes(body)
 

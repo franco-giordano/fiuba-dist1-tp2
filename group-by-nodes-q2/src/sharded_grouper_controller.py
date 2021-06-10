@@ -20,15 +20,18 @@ class ShardedGrouperController:
 
     def run(self):
         logging.info(f'Q2 GROUPER {self.assigned_shard_key}: Waiting for messages. To exit press CTRL+C')
-        self.channel.start_consuming()
+        try:
+            self.channel.start_consuming()
+        except KeyboardInterrupt:
+            logging.warning('Q2 GROUPER: ######### Received Ctrl+C! Stopping...')
+            self.channel.stop_consuming()
         self.connection.close()
 
     def _callback(self, ch, method, properties, body):
         if BatchEncoderDecoder.is_encoded_sentinel(body):
             logging.info(f"Q2 GROUPER {self.assigned_shard_key}: Received sentinel! Flushing and shutting down...")
             self.matches_grouper.received_sentinel()
-            # TODO: shutdown my node
-            return
+            raise KeyboardInterrupt
 
         batch = BatchEncoderDecoder.decode_bytes(body)
         logging.info(f'Q2 GROUPER {self.assigned_shard_key}: Received batch {body[:25]}...')

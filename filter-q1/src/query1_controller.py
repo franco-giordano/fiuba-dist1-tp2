@@ -20,14 +20,17 @@ class Query1Controller:
 
     def run(self):
         logging.info('FILTER QUERY1: Waiting for messages. To exit press CTRL+C')
-        self.channel.start_consuming()
+        try:
+            self.channel.start_consuming()
+        except KeyboardInterrupt:
+            logging.warning('FILTER QUERY1: ######### Received Ctrl+C! Stopping...')
+            self.channel.stop_consuming()
         self.connection.close()
 
     def _callback(self, ch, method, properties, body):
         if BatchEncoderDecoder.is_encoded_sentinel(body):
             logging.info(f"FILTER QUERY1: Received sentinel! Shutting down...")
-            # TODO: shutdown my node
-            return
+            raise KeyboardInterrupt
 
         batch = BatchEncoderDecoder.decode_bytes(body)
         logging.info(f"FILTER QUERY1: Received batch {body[:25]}...")

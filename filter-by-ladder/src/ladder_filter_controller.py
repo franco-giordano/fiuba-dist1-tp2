@@ -4,9 +4,10 @@ from common.utils.rabbit_utils import RabbitUtils
 import logging
 
 class LadderFilterController:
-    def __init__(self, rabbit_ip, matches_exchange_name, output_exchange_name, route_1v1, route_team):
+    def __init__(self, rabbit_ip, matches_exchange_name, output_exchange_name, route_1v1, route_team, max_outgoing_sentinels):
         self.matches_exchange_name = matches_exchange_name
         self.output_exchange_name = output_exchange_name
+        self.max_outgoing_sentinels = max_outgoing_sentinels
 
         self.connection, self.channel = RabbitUtils.setup_connection_with_channel(rabbit_ip)
 
@@ -20,14 +21,23 @@ class LadderFilterController:
 
     def run(self):
         logging.info('FILTER BY LADDER: Waiting for messages. To exit press CTRL+C')
-        self.channel.start_consuming()
+        try:
+            self.channel.start_consuming()
+        except KeyboardInterrupt:
+            logging.warning('FILTER BY LADDER: ######### Received Ctrl+C! Stopping...')
+            self.channel.stop_consuming()
         self.connection.close()
 
     def _callback(self, ch, method, properties, body):
         if BatchEncoderDecoder.is_encoded_sentinel(body):
-            logging.info(f"FILTER BY LADDER: Received sentinel! Shutting down...")
+            logging.info(f"FILTER BY LADDER: Received sentinel! Propagating and shutting down...")
+            for i in range(self.max_outgoing_sentinels):
+                self.channel.basic_publish(exchange=self.output_exchange_name, \
+                    routing_key=self.batched_filter.route_1v1, body=body)
+                self.channel.basic_publish(exchange=self.output_exchange_name, \
+                    routing_key=self.batched_filter.route_team, body=body)
             # TODO: shutdown my node
-            return
+            raise KeyboardInterrupt
 
         batch = BatchEncoderDecoder.decode_bytes(body)
         logging.info(f"FILTER BY LADDER: Received batch {body[:25]}...")

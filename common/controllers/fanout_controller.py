@@ -18,7 +18,11 @@ class FanoutController:
 
     def run(self):
         logging.info('FANOUT: Waiting for messages. To exit press CTRL+C')
-        self.channel.start_consuming()
+        try:
+            self.channel.start_consuming()
+        except KeyboardInterrupt:
+            logging.warning('FANOUT: ######### Received Ctrl+C! Stopping...')
+            self.channel.stop_consuming()
         self.connection.close()
 
     def _callback(self, ch, method, properties, body):
@@ -29,5 +33,4 @@ class FanoutController:
         
         if is_sentinel:
             logging.info(f"FANOUT: Received sentinel! Shutting down...")
-            # TODO: shutdown my node...
-            pass
+            raise KeyboardInterrupt

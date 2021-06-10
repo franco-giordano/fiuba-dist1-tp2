@@ -22,7 +22,11 @@ class ShardedJoinerController:
 
     def run(self):
         logging.info(f'SHARDED JOINER {self.assigned_shard_key}: Waiting for messages. To exit press CTRL+C')
-        self.channel.start_consuming()
+        try:
+            self.channel.start_consuming()
+        except KeyboardInterrupt:
+            logging.warning('SHARDED JOINER: ######### Received Ctrl+C! Stopping...')
+            self.channel.stop_consuming()
         self.connection.close()
 
     def _callback(self, ch, method, properties, body):
@@ -31,8 +35,7 @@ class ShardedJoinerController:
             if self.sentinel_tracker.count_and_reached_limit():
                 logging.info(f"SHARDED JOINER {self.assigned_shard_key}: Received all sentinels! Flushing and shutting down...")
                 self.matches_joiner.received_sentinel()
-            # TODO: shutdown my node
-            return
+                raise KeyboardInterrupt
 
         batch = BatchEncoderDecoder.decode_bytes(body)
         logging.info(f'SHARDED JOINER {self.assigned_shard_key}: Received batch {body[:25]}...')
