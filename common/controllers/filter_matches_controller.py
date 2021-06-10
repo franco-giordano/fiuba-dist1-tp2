@@ -20,13 +20,13 @@ class FilterMatchesController:
         self.sharded_outgoing_batcher = ShardedOutgoingBatcher(self.channel, reducers_amount, batch_size, output_exchange_name, tkn_key='token')
 
     def run(self):
-        logging.info('FILTER QUERY3: Waiting for messages. To exit press CTRL+C')
+        logging.info('FILTER MATCHES: Waiting for messages. To exit press CTRL+C')
         self.channel.start_consuming()
         self.connection.close()
 
     def _callback(self, ch, method, properties, body):
         if BatchEncoderDecoder.is_encoded_sentinel(body):
-            logging.info(f"FILTER QUERY3: Received sentinel! Shutting down...")
+            logging.info(f"FILTER MATCHES: Received sentinel! Shutting down...")
             self.sharded_outgoing_batcher.received_sentinel()
             # TODO: shutdown my node
             return

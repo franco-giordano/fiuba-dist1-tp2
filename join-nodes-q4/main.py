@@ -27,7 +27,7 @@ def main():
 
 def reducer_init(proc_id, rabbit_ip, shard_exchange_name, output_exchange_name, next_reducers_amount):
 	shard_key = str(proc_id)
-	joiner = ShardedJoinerController(rabbit_ip, shard_exchange_name, output_exchange_name, shard_key, next_reducers_amount, force_send=False)
+	joiner = ShardedJoinerController(rabbit_ip, shard_exchange_name, output_exchange_name, shard_key, next_reducers_amount, force_send=True)
 	joiner.run()
 
 if __name__== "__main__":

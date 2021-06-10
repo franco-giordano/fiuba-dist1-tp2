@@ -17,6 +17,7 @@ docker-image:
 	docker build -f ./join-nodes-q3/Dockerfile -t "join-nodes-q3:latest" .
 	docker build -f ./group-by-nodes-q3/Dockerfile -t "group-by-nodes-q3:latest" .
 	docker build -f ./filter-matches-q4/Dockerfile -t "filter-matches-q4:latest" .
+	docker build -f ./join-nodes-q4/Dockerfile -t "join-nodes-q4:latest" .
 .PHONY: docker-image
 
 rabbit-up:
