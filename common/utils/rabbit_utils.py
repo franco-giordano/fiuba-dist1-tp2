@@ -8,10 +8,13 @@ class RabbitUtils:
         return conn, channel
 
     @staticmethod
-    def setup_input_direct_exchange(channel, exchange_name, routing_key, callback):
+    def setup_input_direct_exchange(channel, exchange_name, routing_key, callback, queue_name=None):
         channel.exchange_declare(exchange=exchange_name, exchange_type='direct')
-        result = channel.queue_declare(queue='', exclusive=True)
-        queue_name = result.method.queue
+        if not queue_name:
+            result = channel.queue_declare(queue='', exclusive=True)
+            queue_name = result.method.queue
+        else:
+            channel.queue_declare(queue=queue_name, exclusive=False)
         channel.queue_bind(exchange=exchange_name, queue=queue_name, routing_key=routing_key)
         channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
 

@@ -4,14 +4,14 @@ from common.utils.rabbit_utils import RabbitUtils
 import logging
 
 class FilterMatchesController:
-    def __init__(self, rabbit_ip, matches_exchange_name, output_exchange_name, reducers_amount, routing_key, batch_size, match_filter):
+    def __init__(self, rabbit_ip, matches_exchange_name, output_exchange_name, reducers_amount, routing_key, batch_size, match_filter, queue_name):
         self.matches_exchange_name = matches_exchange_name
         self.output_exchange_name = output_exchange_name
 
         self.connection, self.channel = RabbitUtils.setup_connection_with_channel(rabbit_ip)
 
         # input exchange
-        RabbitUtils.setup_input_direct_exchange(self.channel, self.matches_exchange_name, routing_key, self._callback)
+        RabbitUtils.setup_input_direct_exchange(self.channel, self.matches_exchange_name, routing_key, self._callback, queue_name)
 
         # output exchange
         RabbitUtils.setup_output_direct_exchange(self.channel, self.output_exchange_name)

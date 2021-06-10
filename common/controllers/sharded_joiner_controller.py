@@ -2,9 +2,10 @@ import logging
 from common.models.matches_joiner import MatchesJoiner
 from common.encoders.batch_encoder_decoder import BatchEncoderDecoder
 from common.utils.rabbit_utils import RabbitUtils
+from common.models.sentinel_tracker import SentinelTracker
 
 class ShardedJoinerController:
-    def __init__(self, rabbit_ip, shard_exchange_name, output_exchange_name, assigned_shard_key, next_reducers_amount, force_send):
+    def __init__(self, rabbit_ip, shard_exchange_name, output_exchange_name, assigned_shard_key, next_reducers_amount, total_incoming_sentinels, force_send):
         self.shard_exchange_name = shard_exchange_name
         self.assigned_shard_key = assigned_shard_key
 
@@ -17,6 +18,7 @@ class ShardedJoinerController:
         RabbitUtils.setup_output_direct_exchange(self.channel, output_exchange_name)
 
         self.matches_joiner = MatchesJoiner(self.channel, output_exchange_name, next_reducers_amount, force_send_on_first_join=force_send)
+        self.sentinel_tracker = SentinelTracker(total_incoming_sentinels)
 
     def run(self):
         logging.info(f'SHARDED JOINER {self.assigned_shard_key}: Waiting for messages. To exit press CTRL+C')
@@ -25,8 +27,10 @@ class ShardedJoinerController:
 
     def _callback(self, ch, method, properties, body):
         if BatchEncoderDecoder.is_encoded_sentinel(body):
-            logging.info(f"SHARDED JOINER {self.assigned_shard_key}: Received sentinel! Flushing and shutting down...")
-            self.matches_joiner.received_sentinel()
+            logging.info(f"SHARDED JOINER {self.assigned_shard_key}: Received one sentinel!")
+            if self.sentinel_tracker.count_and_reached_limit():
+                logging.info(f"SHARDED JOINER {self.assigned_shard_key}: Received all sentinels! Flushing and shutting down...")
+                self.matches_joiner.received_sentinel()
             # TODO: shutdown my node
             return
 

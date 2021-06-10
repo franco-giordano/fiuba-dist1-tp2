@@ -8,26 +8,29 @@ def main():
 		{'SHARD_EXCHANGE_NAME': False,
 		'OUTPUT_QUEUE_NAME': False,
 		'RABBIT_IP': False,
-		'REDUCERS_AMOUNT': True})
-	rabbit_ip = config_params['RABBIT_IP']
-	shard_exchange_name = config_params['SHARD_EXCHANGE_NAME']
+		'REDUCERS_AMOUNT': True,
+		'TOTAL_INCOMING_SENTINELS': True})
 	reducers_amount = config_params['REDUCERS_AMOUNT']
-	output_queue_name = config_params['OUTPUT_QUEUE_NAME']
-
+	
 	reducers_proc = []
 
 	for i in range(reducers_amount):
-		pr = Process(target=reducer_init, args=(i, rabbit_ip, shard_exchange_name, output_queue_name))
+		pr = Process(target=reducer_init, args=(i, config_params))
 		reducers_proc.append(pr)
 		pr.start()
 
 	for p in reducers_proc:
 		p.join()
 
-def reducer_init(proc_id, rabbit_ip, shard_exchange_name, output_queue_name):
+def reducer_init(proc_id, config_params):
+	rabbit_ip = config_params['RABBIT_IP']
+	shard_exchange_name = config_params['SHARD_EXCHANGE_NAME']
+	output_queue_name = config_params['OUTPUT_QUEUE_NAME']
+	total_incoming_sentinels = config_params['TOTAL_INCOMING_SENTINELS']
+
 	shard_key = str(proc_id)
 	aggregator = VictoriesTotalAggregator()
-	grouper = ShardedGrouperController(rabbit_ip, shard_exchange_name, output_queue_name, shard_key, aggregator)
+	grouper = ShardedGrouperController(rabbit_ip, shard_exchange_name, output_queue_name, shard_key, aggregator, total_incoming_sentinels)
 	grouper.run()
 
 if __name__== "__main__":

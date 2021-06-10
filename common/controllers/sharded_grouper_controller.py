@@ -2,9 +2,10 @@ import logging
 from common.models.civilizations_grouper import CivilizationsGrouper
 from common.encoders.batch_encoder_decoder import BatchEncoderDecoder
 from common.utils.rabbit_utils import RabbitUtils
+from common.models.sentinel_tracker import SentinelTracker
 
 class ShardedGrouperController:
-    def __init__(self, rabbit_ip, shard_exchange_name, output_queue_name, assigned_shard_key, aggregator):
+    def __init__(self, rabbit_ip, shard_exchange_name, output_queue_name, assigned_shard_key, aggregator, total_incoming_sentinels):
         self.shard_exchange_name = shard_exchange_name
         self.assigned_shard_key = assigned_shard_key
 
@@ -17,6 +18,7 @@ class ShardedGrouperController:
         RabbitUtils.setup_queue(self.channel, output_queue_name)
 
         self.civ_grouper = CivilizationsGrouper(self.channel, output_queue_name, aggregator)
+        self.sentinel_tracker = SentinelTracker(total_incoming_sentinels)
 
     def run(self):
         logging.info(f'SHARDED GROUPER {self.assigned_shard_key}: Waiting for messages. To exit press CTRL+C')
@@ -25,8 +27,10 @@ class ShardedGrouperController:
 
     def _callback(self, ch, method, properties, body):
         if BatchEncoderDecoder.is_encoded_sentinel(body):
-            logging.info(f"SHARDED GROUPER {self.assigned_shard_key}: Received sentinel! Flushing and shutting down...")
-            self.civ_grouper.received_sentinel()
+            logging.info(f"SHARDED JOINER {self.assigned_shard_key}: Received one sentinel!")
+            if self.sentinel_tracker.count_and_reached_limit():
+                logging.info(f"SHARDED GROUPER {self.assigned_shard_key}: Received all sentinels! Flushing and shutting down...")
+                self.civ_grouper.received_sentinel()
             # TODO: shutdown my node
             return
 
