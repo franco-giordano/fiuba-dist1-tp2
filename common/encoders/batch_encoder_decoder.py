@@ -1,7 +1,7 @@
 from common.encoders.obj_encoder_decoder import ObjectEncoderDecoder
 
 class BatchEncoderDecoder:
-    SENTINEL = []
+    SENTINEL = ['SENTINEL']
     ENCODED_SENTINEL = ObjectEncoderDecoder.encode_obj(SENTINEL)
 
     @staticmethod

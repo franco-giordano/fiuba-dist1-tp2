@@ -52,11 +52,3 @@ class LadderFilterController:
             logging.info(f'FILTER BY LADDER: Sending to output exchange matches for route TEAM')
             ser2 = BatchEncoderDecoder.encode_batch(batch_team)
             self.channel.basic_publish(exchange=self.output_exchange_name, routing_key=self.batched_filter.route_team, body=ser2)
-    
-        # TODO: change to batched publish? takes too long
-        # for match in batch:
-        #     route = self.filter.select_route(match)
-        #     logging.info(f'FILTER BY LADDER: Sending to output exchange the match {match} with route {route}')
-        #     serialized = MatchEncoderDecoder.encode_match(match)
-        #     self.channel.basic_publish(exchange=self.output_exchange_name, routing_key=route, body=serialized)
-    

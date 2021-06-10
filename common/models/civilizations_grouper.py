@@ -18,7 +18,9 @@ class CivilizationsGrouper:
     def received_sentinel(self):
         logging.info(f'CIVS GROUPER: Flushing all grouped civs')
         self.flush_results()
-        # TODO: send sentinel!
+        logging.info(f'CIV GROUPER: Sending sentinel...')
+        sentinel = BatchEncoderDecoder.create_encoded_sentinel()
+        self.channel.basic_publish(exchange='', routing_key=self.output_queue_name, body=sentinel)
 
     def flush_results(self):
         for civ,results in self.current_civs.items():

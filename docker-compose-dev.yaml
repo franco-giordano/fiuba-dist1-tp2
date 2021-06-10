@@ -168,6 +168,30 @@ services:
     networks:
       - testing_net
 
+  final-accumulator-q3:
+    stop_signal: SIGINT
+    container_name: final-accumulator-q3
+    image: final-accumulator-q3:latest
+    entrypoint: python3 /main.py
+    depends_on:
+      - group-by-nodes-q3
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - testing_net
+
+  final-accumulator-q4:
+    stop_signal: SIGINT
+    container_name: final-accumulator-q4
+    image: final-accumulator-q4:latest
+    entrypoint: python3 /main.py
+    depends_on:
+      - group-by-nodes-q4
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - testing_net
+
 networks:
   testing_net:
     ipam:

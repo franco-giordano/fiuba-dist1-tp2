@@ -61,10 +61,3 @@ class MatchesJoiner:
         all_keys = self.shard_key_getter.generate_all_shard_keys()
         for key in all_keys:
             self.channel.basic_publish(exchange=self.output_exchange_name, routing_key=key, body=sentinel)
-
-    # def flush_1v1_matches(self):
-    #     for tkn,players in self.current_matches.items():
-    #         if players and len(players) == 2 and self.last_filter.should_pass(players):
-    #             logging.info(f'MATCH 1v1 GROUPER: Announcing players for match {tkn}')
-    #             serialized = BatchEncoderDecoder.encode_batch(players)
-    #             self.channel.basic_publish(exchange='', routing_key=self.output_queue_name, body=serialized)

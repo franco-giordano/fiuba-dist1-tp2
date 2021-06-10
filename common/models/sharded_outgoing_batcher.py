@@ -39,6 +39,6 @@ class ShardedOutgoingBatcher:
 
     def _flush_all_batches(self):
         for shard_key, batch in self.all_outgoing_batches.items():
-            serialized = BatchEncoderDecoder.encode_batch(batch)
-            self.channel.basic_publish(exchange=self.output_exchange_name, routing_key=shard_key, body=serialized)
-
+            if batch:
+                serialized = BatchEncoderDecoder.encode_batch(batch)
+                self.channel.basic_publish(exchange=self.output_exchange_name, routing_key=shard_key, body=serialized)

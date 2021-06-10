@@ -31,11 +31,12 @@ class ShardedGrouperController:
 
     def _callback(self, ch, method, properties, body):
         if BatchEncoderDecoder.is_encoded_sentinel(body):
-            logging.info(f"SHARDED JOINER {self.assigned_shard_key}: Received one sentinel!")
+            logging.info(f"SHARDED GROUPER {self.assigned_shard_key}: Received one sentinel!")
             if self.sentinel_tracker.count_and_reached_limit():
                 logging.info(f"SHARDED GROUPER {self.assigned_shard_key}: Received all sentinels! Flushing and shutting down...")
                 self.civ_grouper.received_sentinel()
                 raise KeyboardInterrupt
+            return
 
         joined_match = BatchEncoderDecoder.decode_bytes(body)
         logging.info(f'SHARDED GROUPER {self.assigned_shard_key}: Received joined match {body[:25]}...')

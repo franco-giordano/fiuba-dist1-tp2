@@ -19,6 +19,8 @@ docker-image:
 	docker build -f ./filter-matches-q4/Dockerfile -t "filter-matches-q4:latest" .
 	docker build -f ./join-nodes-q4/Dockerfile -t "join-nodes-q4:latest" .
 	docker build -f ./group-by-nodes-q4/Dockerfile -t "group-by-nodes-q4:latest" .
+	docker build -f ./final-accumulator-q3/Dockerfile -t "final-accumulator-q3:latest" .
+	docker build -f ./final-accumulator-q4/Dockerfile -t "final-accumulator-q4:latest" .
 .PHONY: docker-image
 
 rabbit-up:

@@ -5,7 +5,7 @@ from common.utils.rabbit_utils import RabbitUtils
 from common.models.sentinel_tracker import SentinelTracker
 
 class ShardedJoinerController:
-    def __init__(self, rabbit_ip, shard_exchange_name, output_exchange_name, assigned_shard_key, next_reducers_amount, total_incoming_sentinels, force_send):
+    def __init__(self, rabbit_ip, shard_exchange_name, output_exchange_name, assigned_shard_key, next_reducers_amount, total_incoming_sentinels, force_send=False):
         self.shard_exchange_name = shard_exchange_name
         self.assigned_shard_key = assigned_shard_key
 
@@ -36,6 +36,7 @@ class ShardedJoinerController:
                 logging.info(f"SHARDED JOINER {self.assigned_shard_key}: Received all sentinels! Flushing and shutting down...")
                 self.matches_joiner.received_sentinel()
                 raise KeyboardInterrupt
+            return
 
         batch = BatchEncoderDecoder.decode_bytes(body)
         logging.info(f'SHARDED JOINER {self.assigned_shard_key}: Received batch {body[:25]}...')
