@@ -14,7 +14,8 @@ def main():
 		'RESULTS_1': False,
 		'RESULTS_2': False,
 		'RESULTS_3': False,
-		'RESULTS_4': False})
+		'RESULTS_4': False,
+		'OUTPUT_FILE': False})
 
 	rabbit_ip = config_params['RABBIT_IP']
 	matches_queue = config_params['INPUT_MATCHES_QUEUE']
@@ -38,8 +39,9 @@ def results_init(config_params):
 	results2 = config_params['RESULTS_2']
 	results3 = config_params['RESULTS_3']
 	results4 = config_params['RESULTS_4']
+	output_file_name = config_params['OUTPUT_FILE']
 
-	with open('/results/output123.txt', 'w') as res_file:
+	with open(f'/results/{output_file_name}', 'w') as res_file:
 		results = ResultsController(rabbit_ip, results1, results2, results3, results4, res_file)
 		results.run()
 
